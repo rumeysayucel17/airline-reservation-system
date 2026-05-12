@@ -1,0 +1,2791 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airline Reservation System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        /* Animated Header with Video Background */
+        .animated-header {
+            position: relative;
+            height: 400px;
+            background: #0b1d36;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .hero-video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: saturate(1.05) brightness(1.05);
+        }
+
+        .header-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, rgba(8, 17, 35, 0.75), rgba(8, 38, 78, 0.35));
+            z-index: 1;
+        }
+        
+        .header-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #0f1f38;
+            z-index: 3;
+            background: rgba(255, 255, 255, 0.88);
+            padding: 20px 28px;
+            border-radius: 14px;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+        }
+        
+        .header-content h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            font-weight: 800;
+            color: #0a2a52;
+            letter-spacing: 0.5px;
+        }
+        
+        .header-content p {
+            font-size: 1.3rem;
+            opacity: 0.92;
+            color: #1f3552;
+            font-weight: 600;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .main-nav {
+            display: flex;
+            justify-content: center;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            overflow: hidden;
+            flex-wrap: wrap;
+        }
+        
+        .nav-btn {
+            padding: 15px 30px;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: #555;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-btn:hover {
+            background-color: #f0f5ff;
+            color: #2a5298;
+        }
+        
+        .nav-btn.active {
+            background-color: #2a5298;
+            color: white;
+        }
+        
+        .content-section {
+            display: none;
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+        
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        h2 {
+            color: #1e3c72;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eaeaea;
+        }
+        
+        h3 {
+            color: #2a5298;
+            margin: 20px 0 15px 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eaeaea;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+        
+        input, select, button {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 2px rgba(42, 82, 152, 0.2);
+        }
+        
+        input.invalid {
+            border-color: #dc3545;
+            background-color: #fff5f5;
+            box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.2);
+        }
+        
+        input.invalid:focus {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.3);
+        }
+        
+        button {
+            background-color: #2a5298;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background-color: #1e3c72;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+        }
+        
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .flight-card {
+            border: 1px solid #eaeaea;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .flight-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .flight-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .flight-route {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1e3c72;
+        }
+        
+        .flight-price {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #28a745;
+        }
+        
+        .flight-details {
+            display: flex;
+            justify-content: space-between;
+            color: #666;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        /* Seat map styles */
+        .airplane-seat-map {
+            position: relative;
+            margin: 30px auto;
+            max-width: 1100px;
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(180deg, #f6f8fb 0%, #e9edf3 100%);
+            border: 1px solid #c6cfda;
+            border-radius: 26px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .fuselage-outline {
+            position: relative;
+            z-index: 2;
+            padding: 28px 22px 38px 54px;
+            background: radial-gradient(circle at 10% 50%, rgba(60, 98, 143, 0.08), rgba(60, 98, 143, 0)),
+                        linear-gradient(180deg, #fdfefe 0%, #f2f5f9 100%);
+            border: 2px solid #7a899d;
+            border-radius: 220px / 110px;
+            overflow: hidden;
+            isolation: isolate;
+        }
+
+        .fuselage-outline:before {
+            content: '';
+            position: absolute;
+            inset: 12px;
+            border: 1px dashed rgba(90, 110, 135, 0.45);
+            border-radius: 190px / 96px;
+            pointer-events: none;
+        }
+
+        .nose-shape {
+            position: absolute;
+            left: -70px;
+            top: 50%;
+            width: 120px;
+            height: 180px;
+            transform: translateY(-50%) rotate(-2deg);
+            background: linear-gradient(90deg, #d7dde6 0%, #eef1f6 70%);
+            clip-path: polygon(90% 50%, 0% 0%, 0% 100%);
+            border: 2px solid #7a899d;
+            border-right: none;
+            border-radius: 10px 0 0 10px;
+            box-shadow: inset -6px 0 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .tail-shape {
+            position: absolute;
+            right: -40px;
+            top: 50%;
+            width: 80px;
+            height: 160px;
+            transform: translateY(-50%) rotate(2deg);
+            background: linear-gradient(90deg, #f4f6fa 0%, #dbe1eb 100%);
+            clip-path: polygon(0% 50%, 100% 0%, 100% 100%);
+            border: 2px solid #7a899d;
+            border-left: none;
+            border-radius: 0 10px 10px 0;
+            box-shadow: inset 6px 0 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .cabin-shell {
+            position: relative;
+            background: #ffffff;
+            border: 1px solid #dbe1eb;
+            border-radius: 190px / 90px;
+            padding: 24px 24px 30px;
+            box-shadow:
+                inset 0 0 0 1px #eef2f6,
+                inset 0 15px 30px rgba(0, 0, 0, 0.04);
+        }
+
+        /* windows & aisle */
+        .cabin-shell:before {
+            content: '';
+            position: absolute;
+            top: 16px;
+            left: 26px;
+            right: 26px;
+            height: 12px;
+            background-image: radial-gradient(circle 6px at 6px 6px, rgba(30, 60, 114, 0.6), rgba(30, 60, 114, 0) 60%);
+            background-repeat: repeat-x;
+            background-size: 38px 12px;
+            opacity: 0.9;
+            pointer-events: none;
+        }
+
+        .cabin-shell:after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            bottom: 20px;
+            left: 50%;
+            width: 70px;
+            transform: translateX(-50%);
+            background: linear-gradient(180deg, rgba(30, 60, 114, 0.07), rgba(30, 60, 114, 0));
+            border-left: 1px dashed rgba(30, 60, 114, 0.35);
+            border-right: 1px dashed rgba(30, 60, 114, 0.35);
+            pointer-events: none;
+        }
+
+        .cabin-header,
+        .cabin-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .service-marker {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            font-size: 0.78rem;
+            color: #0f1f38;
+            border: 1px solid #cdd6e3;
+            background: linear-gradient(180deg, #f7fafc 0%, #eef2f7 100%);
+        }
+
+        .service-marker.galley {
+            background: linear-gradient(180deg, #e5f3ff 0%, #d6e9ff 100%);
+            border-color: #9ac3ff;
+            color: #0b2f63;
+        }
+
+        .service-marker.lav {
+            background: linear-gradient(180deg, #f7f5ff 0%, #ebe7ff 100%);
+            border-color: #c2b8ff;
+            color: #27105c;
+        }
+
+        .service-marker.exit {
+            background: repeating-linear-gradient(
+                -45deg,
+                rgba(217, 83, 79, 0.14),
+                rgba(217, 83, 79, 0.14) 8px,
+                rgba(248, 215, 218, 0.5) 8px,
+                rgba(248, 215, 218, 0.5) 16px
+            );
+            border-color: #d9534f;
+            color: #7c1411;
+        }
+
+        .service-band {
+            margin: 14px 0;
+            padding: 8px 12px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            background: repeating-linear-gradient(
+                -45deg,
+                rgba(217, 83, 79, 0.18),
+                rgba(217, 83, 79, 0.18) 8px,
+                rgba(248, 215, 218, 0.5) 8px,
+                rgba(248, 215, 218, 0.5) 16px
+            );
+            color: #7c1411;
+            border: 1px solid #d9534f;
+        }
+
+        .seat-section {
+            margin-bottom: 20px;
+        }
+        
+        .seat-section-title {
+            font-weight: bold;
+            color: #1e3c72;
+            margin-bottom: 10px;
+            text-align: center;
+            font-size: 1rem;
+        }
+        
+        .seat-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            padding: 6px 8px 6px 54px;
+            border-radius: 10px;
+            background: linear-gradient(180deg, rgba(15, 31, 56, 0.02), rgba(15, 31, 56, 0.05));
+        }
+        
+        .seat-row.exit-row {
+            position: relative;
+            background: repeating-linear-gradient(
+                -45deg,
+                rgba(217, 83, 79, 0.15),
+                rgba(217, 83, 79, 0.15) 8px,
+                rgba(248, 215, 218, 0.4) 8px,
+                rgba(248, 215, 218, 0.4) 16px
+            );
+        }
+
+        .seat-row.exit-row:before {
+            content: 'EXIT';
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: #7c1411;
+            letter-spacing: 0.06em;
+            padding: 2px 6px;
+            border: 1px solid #d9534f;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.75);
+        }
+        
+        .row-number {
+            width: 32px;
+            text-align: center;
+            font-weight: bold;
+            color: #3b4d63;
+            font-size: 0.92rem;
+        }
+        
+        .seat {
+            width: 48px;
+            height: 36px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid;
+        }
+        
+        .seat.available {
+            background-color: #42b39b;
+            color: #fff;
+            border-color: #2f8b75;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+        }
+        
+        .seat.available:hover {
+            background-color: #ffa733;
+            transform: translateY(-1px);
+        }
+        
+        .seat.selected {
+            background-color: #4c9cff;
+            color: #fff;
+            border-color: #2f7ee5;
+            box-shadow: 0 0 0 3px rgba(47,126,229,0.25);
+        }
+        
+        .seat.occupied {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .seat.business {
+            background: linear-gradient(135deg, #f8a120 0%, #f17c00 100%);
+            color: #fff;
+            border-color: #d76a00;
+        }
+        
+        .seat.business.available {
+            background: linear-gradient(135deg, #f8a120 0%, #f17c00 100%);
+            color: #fff;
+        }
+        
+        .seat.business.available:hover {
+            background: linear-gradient(135deg, #ff6b35 0%, #d94f1f 100%);
+            transform: translateY(-1px);
+        }
+
+        .seat.premium-seat {
+            background: linear-gradient(135deg, #f8a120 0%, #f17c00 100%);
+            border-color: #d76a00;
+            color: #fff;
+        }
+        
+        .seat.premium-seat.available:hover {
+            background: linear-gradient(135deg, #ff6b35 0%, #d94f1f 100%);
+            transform: translateY(-1px);
+        }
+
+        .seat.standard-seat {
+            background-color: #42b39b;
+            border-color: #2f8b75;
+            color: #fff;
+        }
+
+        .seat.exit-row-seat {
+            background: repeating-linear-gradient(
+                -45deg,
+                #d9534f,
+                #d9534f 6px,
+                #f4a6a3 6px,
+                #f4a6a3 12px
+            );
+            border-color: #b52b27;
+            color: #fff;
+        }
+        
+        .seat.exit-row-seat.available:hover {
+            background: repeating-linear-gradient(
+                -45deg,
+                #9d1f1a,
+                #9d1f1a 6px,
+                #c94a45 6px,
+                #c94a45 12px
+            );
+            transform: translateY(-1px);
+        }
+        
+        .seat-aisle {
+            width: 24px;
+        }
+        
+        .seat-legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        
+        .ticket-card {
+            border-left: 5px solid #2a5298;
+            padding: 20px;
+            margin-bottom: 15px;
+            background-color: #f8f9fa;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .ticket-preview {
+            margin-top: 25px;
+            padding: 20px;
+            border: 1px dashed #cfd6e0;
+            border-radius: 10px;
+            background-color: #fbfcfe;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .ticket-preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+        
+        .ticket-preview canvas {
+            width: 100%;
+            max-width: 760px;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+            background: #fff;
+            display: block;
+        }
+        
+        .notification {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .notification.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+        
+        .notification.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+        
+        .notification.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            display: block;
+        }
+
+        /* Announcements from admin dashboard */
+        .announcement-board {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #f5f7fa;
+            border-radius: 10px;
+            padding: 18px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 20px rgba(30, 60, 114, 0.3);
+            display: none;
+        }
+
+        .announcement-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .announcement-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .announcement-item {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 8px;
+            padding: 10px 12px;
+        }
+
+        .announcement-title {
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .announcement-message {
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .announcement-meta {
+            margin-top: 6px;
+            font-size: 0.85rem;
+            color: #d1d5db;
+        }
+
+        /* Campaigns from admin dashboard */
+        .campaigns-board {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #f5f7fa;
+            border-radius: 10px;
+            padding: 18px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 20px rgba(30, 60, 114, 0.3);
+            display: none;
+        }
+
+        .campaigns-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            font-size: 1.1rem;
+        }
+
+        .campaigns-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .campaign-item {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .campaign-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .campaign-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .campaign-code {
+            background: rgba(255,255,255,0.25);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .campaign-discount {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #ffd700;
+            margin: 8px 0;
+        }
+
+        .campaign-dates {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 8px;
+        }
+
+        .campaign-status {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .campaign-status.active {
+            background: rgba(40, 167, 69, 0.3);
+            border: 1px solid rgba(40, 167, 69, 0.5);
+        }
+
+        .campaign-status.inactive {
+            background: rgba(108, 117, 125, 0.3);
+            border: 1px solid rgba(108, 117, 125, 0.5);
+        }
+        
+        .email-status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+        
+        /* Weather Widget */
+        .weather-widget {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(30, 60, 114, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        .weather-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            z-index: 2;
+        }
+        .weather-icon {
+            font-size: 48px;
+            line-height: 1;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+        .weather-info {
+            flex: 1;
+        }
+        .weather-location {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .weather-temp {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        .weather-condition {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .weather-warning {
+            margin-top: 15px;
+            padding: 12px 15px;
+            background: rgba(74, 144, 226, 0.2);
+            border: 2px solid #4A90E2;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: pulse-warning 2s infinite;
+        }
+        .warning-icon {
+            font-size: 24px;
+        }
+        .warning-text {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        @keyframes pulse-warning {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(74, 144, 226, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(74, 144, 226, 0); }
+        }
+        
+        /* Kar ve Yağmur Animasyonları */
+        .weather-widget.snowing {
+            position: relative;
+        }
+        
+        .weather-widget.snowing::before {
+            content: '❄';
+            position: absolute;
+            top: -20px;
+            left: 10%;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.9);
+            animation: snow-fall-1 4s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .weather-widget.snowing::after {
+            content: '❄';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            animation: snow-fall-2 3s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .snow-flake {
+            position: absolute;
+            top: -20px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.9);
+            pointer-events: none;
+            z-index: 1;
+            animation: snow-fall-var 3s linear infinite;
+        }
+        
+        @keyframes snow-fall-1 {
+            0% {
+                transform: translateY(0) translateX(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(300px) translateX(30px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes snow-fall-2 {
+            0% {
+                transform: translateY(0) translateX(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(300px) translateX(-20px) rotate(-360deg);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes snow-fall-var {
+            0% {
+                transform: translateY(0) translateX(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(300px) translateX(var(--snow-x, 20px)) rotate(var(--snow-rotate, 360deg));
+                opacity: 0;
+            }
+        }
+        
+        .weather-widget.raining::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+            background-size: 3px 15px;
+            background-repeat: repeat;
+            animation: rain-fall 0.6s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .rain-drop {
+            position: absolute;
+            top: -10px;
+            width: 2px;
+            height: 20px;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.2));
+            pointer-events: none;
+            z-index: 1;
+            animation: rain-drop-fall 0.8s linear infinite;
+        }
+        
+        @keyframes rain-fall {
+            0% {
+                background-position: 0 0;
+            }
+            100% {
+                background-position: 0 15px;
+            }
+        }
+        
+        @keyframes rain-drop-fall {
+            0% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(300px);
+                opacity: 0;
+            }
+        }
+        
+        /* Kar tanesi için özel stil */
+        .weather-widget .weather-icon[data-weather="snow"],
+        .weather-widget .weather-icon[data-weather="heavy-snow"] {
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.9)) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .email-sent {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .email-failed {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1e3c72;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .passenger-card {
+            background-color: white;
+            border: 1px solid #eaeaea;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Contact Section */
+        .contact-section {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 50px 20px;
+            margin-top: 0;
+            text-align: center;
+        }
+        
+        .contact-section h2 {
+            color: white;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            margin-bottom: 30px;
+        }
+        
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .contact-item a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+        
+        .contact-item a:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+        
+        /* About Us Section */
+        .about-section {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8f0f8 100%);
+            color: #333;
+            padding: 50px 20px;
+            margin-top: 50px;
+            text-align: center;
+        }
+        
+        .about-section h2 {
+            color: #1e3c72;
+            border-bottom: 2px solid rgba(30, 60, 114, 0.3);
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+        }
+        
+        .about-content {
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.8;
+            font-size: 1.1rem;
+            color: #555;
+        }
+        
+        .about-content p {
+            margin-bottom: 20px;
+        }
+        
+        .about-content strong {
+            color: #1e3c72;
+            font-weight: 700;
+        }
+        
+        /* New styles for seat selection flow */
+        .seat-map-instruction {
+            background-color: #e8f4fd;
+            border: 1px solid #b6d4fe;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .seat-map-instruction p {
+            margin: 5px 0;
+        }
+
+        .cabin-section {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #1e3c72;
+            margin-bottom: 15px;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .radio-group {
+            margin-bottom: 15px;
+        }
+
+        /* Seat option buttons (Random / Manual) */
+        .radio-group input[type="radio"] {
+            /* Hide native radio, whole bar becomes clickable */
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .seat-option-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 6px;
+            border: 1px solid #2a5298;
+            background-color: #1e3c72; /* navy like main buttons */
+            color: #ffffff;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+            transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+        }
+
+        .seat-option-text {
+            flex: 1;
+        }
+
+        /* Unselected state: white background with navy border/text */
+        .radio-group input[type="radio"]:not(:checked) + .seat-option-label {
+            background-color: #ffffff;
+            color: #2a5298;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+            transform: translateY(0);
+        }
+
+        /* Selected state: solid navy bar similar to main action button */
+        .radio-group input[type="radio"]:checked + .seat-option-label {
+            background-color: #1e3c72;
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+            transform: translateY(-1px);
+        }
+
+        .radio-group input[type="radio"]:checked + .seat-option-label .fee-badge {
+            background-color: #28a745;
+            color: #ffffff;
+        }
+
+        .radio-group small {
+            display: block;
+            color: #666;
+            margin-left: 4px;
+            margin-top: 6px;
+            font-size: 0.9rem;
+        }
+
+        .fee-badge {
+            background-color: #28a745;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            margin-left: 10px;
+            white-space: nowrap;
+        }
+        
+        .seat.economy.available {
+            background-color: #42b39b;
+            color: #fff;
+            border-color: #2f8b75;
+        }
+        
+        .seat.disabled-seat {
+            background-color: #e0e0e0;
+            color: #999;
+            border-color: #ccc;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        
+        .seat.business.disabled-seat {
+            background: linear-gradient(135deg, #e0e0e0 0%, #d0d0d0 100%);
+            color: #999;
+            border-color: #ccc;
+        }
+        
+        .seat.economy.disabled-seat {
+            background-color: #e0e0e0;
+            color: #999;
+            border-color: #ccc;
+        }
+        
+        /* Payment Section Styles */
+        .payment-summary {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .payment-summary h4 {
+            color: #1e3c72;
+            margin-bottom: 15px;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #dee2e6;
+        }
+        
+        .summary-item.total {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #28a745;
+            border-bottom: 2px solid #28a745;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+        
+        .card-type-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .card-type {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .card-type:hover {
+            border-color: #2a5298;
+            background-color: #f0f5ff;
+        }
+        
+        .card-type.selected {
+            border-color: #2a5298;
+            background-color: #e8f0ff;
+        }
+        
+        .card-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .visa-icon {
+            color: #1a1f71;
+        }
+        
+        .mastercard-icon {
+            color: #eb001b;
+        }
+        
+        .payment-success {
+            text-align: center;
+            padding: 40px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            border: 2px solid #28a745;
+        }
+        
+        .success-icon {
+            font-size: 4rem;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+        
+        .payment-success h3 {
+            color: #28a745;
+            margin-bottom: 15px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        /* Step indicators */
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .step-indicator:before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #ddd;
+            z-index: 1;
+        }
+        
+        .step {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            flex: 1;
+        }
+        
+        .step-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: white;
+            border: 2px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-weight: bold;
+            color: #666;
+        }
+        
+        .step.active .step-circle {
+            background-color: #2a5298;
+            border-color: #2a5298;
+            color: white;
+        }
+        
+        .step.completed .step-circle {
+            background-color: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+        
+        .step-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .step.active .step-label {
+            color: #2a5298;
+            font-weight: bold;
+        }
+
+        /* Language Selector */
+        .language-selector {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 8px 12px;
+        }
+
+        .language-selector select {
+            border: 2px solid #2a5298;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1e3c72;
+            cursor: pointer;
+            background: white;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .language-selector select:hover {
+            background: #f0f5ff;
+            border-color: #1e3c72;
+        }
+
+        .language-selector select:focus {
+            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .language-selector {
+                top: 10px;
+                right: 10px;
+                padding: 6px 10px;
+            }
+
+            .language-selector select {
+                font-size: 0.85rem;
+                padding: 6px 10px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Language Selector -->
+    <div class="language-selector">
+        <select id="language-selector">
+            <option value="en">🇬🇧 English</option>
+            <option value="tr">🇹🇷 Türkçe</option>
+            <option value="ar">🇸🇦 العربية</option>
+        </select>
+    </div>
+
+    <!-- Animated Header -->
+    <div class="animated-header">
+        <video class="hero-video" autoplay muted loop>
+            <source src="plane.mp4" type="video/mp4">
+        </video>
+        <div class="header-overlay"></div>
+        <div class="header-content">
+            <h1>Airline Reservation System</h1>
+            <p>Book, Manage, and Cancel Your Flight Tickets</p>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Weather Widget -->
+        <div id="weather-widget" class="weather-widget">
+            <div class="weather-content">
+                <div class="weather-icon" id="weather-icon">🌤️</div>
+                <div class="weather-info">
+                    <div class="weather-location" id="weather-location">Istanbul</div>
+                    <div class="weather-temp" id="weather-temp">18°C</div>
+                    <div class="weather-condition" id="weather-condition">Partly Cloudy</div>
+                </div>
+            </div>
+            <div id="weather-warning" class="weather-warning" style="display: none;">
+                <span class="warning-icon">⚠️</span>
+                <span class="warning-text" id="warning-text"></span>
+            </div>
+        </div>
+        
+        <nav class="main-nav">
+            <button class="nav-btn active" data-target="search-flights" data-i18n="searchFlights">Search Flights</button>
+            <button class="nav-btn" data-target="book-ticket" data-i18n="bookTicket">Book Ticket</button>
+            <button class="nav-btn" data-target="multi-booking" data-i18n="multipleTickets">Multiple Tickets</button>
+            <button class="nav-btn" data-target="my-tickets" data-i18n="myTickets">My Tickets</button>
+            <button class="nav-btn" data-target="cancel-ticket" data-i18n="cancelTicket">Cancel Ticket</button>
+            <button class="nav-btn" data-target="check-in" data-i18n="checkIn">Check-in</button>
+        </nav>
+
+        <div id="announcement-board" class="announcement-board">
+            <div class="announcement-header">📢 Latest Announcements</div>
+            <div id="announcement-list" class="announcement-list"></div>
+        </div>
+
+        <div id="campaigns-board" class="campaigns-board">
+            <div class="campaigns-header">🎁 Special Campaigns</div>
+            <div id="campaigns-list" class="campaigns-list"></div>
+        </div>
+        
+        <!-- Search Flights Section -->
+        <section id="search-flights" class="content-section active">
+            <h2 data-i18n="searchFlights">Search Flights</h2>
+            <div id="search-notification" class="notification"></div>
+            
+            <div class="grid-2">
+                <div class="form-group">
+                    <label for="departure" data-i18n="departureCity">Departure City</label>
+                    <select id="departure">
+                        <option value="" data-i18n="selectCity">Select City</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="destination" data-i18n="destinationCity">Destination City</label>
+                    <select id="destination">
+                        <option value="" data-i18n="selectCity">Select City</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button id="search-flights-btn" data-i18n="searchFlights">Search Flights</button>
+            
+            <div id="flight-results" style="margin-top: 30px;"></div>
+        </section>
+        
+        <!-- Book Ticket Section -->
+        <section id="book-ticket" class="content-section">
+            <div class="step-indicator">
+                <div class="step active" id="step1">
+                    <div class="step-circle">1</div>
+                    <div class="step-label" data-i18n="passengerInfo">Passenger Info</div>
+                </div>
+                <div class="step" id="step2">
+                    <div class="step-circle">2</div>
+                    <div class="step-label" data-i18n="flightSeat">Flight & Seat</div>
+                </div>
+                <div class="step" id="step3">
+                    <div class="step-circle">3</div>
+                    <div class="step-label" data-i18n="payment">Payment</div>
+                </div>
+            </div>
+            
+            <!-- Step 1: Passenger Information -->
+            <div id="step1-content">
+                <h2 data-i18n="passengerInfo">Passenger Information</h2>
+                <div id="booking-notification" class="notification"></div>
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="passenger-id" data-i18n="idNumber">ID Number</label>
+                        <input type="text" id="passenger-id" data-i18n-placeholder="idNumber" placeholder="ID Number">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="passenger-name" data-i18n="firstName">First Name</label>
+                        <input type="text" id="passenger-name" data-i18n-placeholder="firstName" placeholder="First Name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="passenger-surname" data-i18n="lastName">Last Name</label>
+                        <input type="text" id="passenger-surname" data-i18n-placeholder="lastName" placeholder="Last Name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="passenger-email" data-i18n="emailAddress">Email Address</label>
+                        <input type="email" id="passenger-email" placeholder="@gmail.com">
+                        <small style="color: #666; font-size: 0.9rem;">Ticket confirmation will be sent to this email</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="passenger-phone" data-i18n="phoneNumber">Phone</label>
+                        <input type="text" id="passenger-phone" placeholder="0(5XX) XXX XX XX">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="ticket-type">Ticket Type</label>
+                        <select id="ticket-type">
+                            <option value="FULL">Full Fare</option>
+                            <option value="DISABLED">Disabled / Companion</option>
+                            <option value="TEACHER">Teacher</option>
+                            <option value="STUDENT">Student (12-26)</option>
+                            <option value="VETERAN">Veteran / Martyr Family</option>
+                            <option value="SENIOR">Senior 65+</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button id="next-to-step2" class="btn-success">Continue to Flight Selection</button>
+            </div>
+            
+            <!-- Step 2: Flight and Seat Selection -->
+            <div id="step2-content" class="hidden">
+                <h2 data-i18n="flightSeat">Flight and Seat Selection</h2>
+                <div id="step2-notification" class="notification"></div>
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="flight-select" data-i18n="selectFlight">Select Flight</label>
+                        <select id="flight-select">
+                            <option value="" data-i18n="selectFlight">Select Flight</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="cabin-class" data-i18n="cabinClass">Cabin Class</label>
+                        <select id="cabin-class">
+                            <option value="" data-i18n="cabinClass">Select Cabin Class</option>
+                            <option value="BUSINESS" data-i18n="business">Business Class</option>
+                            <option value="ECONOMY" data-i18n="economy">Economy Class</option>
+                        </select>
+                    </div>
+                </div>
+                
+                    <div id="seat-option-section" style="display: none;">
+                        <h3>Seat Selection</h3>
+                        <div class="radio-group">
+                            <input type="radio" id="seat-option-random" name="seat-option" value="random" checked>
+                            <label class="seat-option-label" for="seat-option-random">
+                                <span class="seat-option-text">Random Seat Assignment (Free)</span>
+                            </label>
+                            <small>System will assign you a random seat in your selected cabin class</small>
+                        </div>
+                        <div class="radio-group">
+                            <input type="radio" id="seat-option-manual" name="seat-option" value="manual">
+                            <label class="seat-option-label" for="seat-option-manual">
+                                <span class="seat-option-text">Manual Seat Selection</span>
+                                <span class="fee-badge">+100 TL</span>
+                            </label>
+                            <small>You can choose your preferred seat for an additional 100 TL</small>
+                        </div>
+                    </div>
+                
+                <div id="manual-seat-selection" style="display: none;">
+                    <h4>Select Your Seat</h4>
+                    <div id="seat-map-container"></div>
+                    <div style="margin-top: 20px;">
+                        <strong>Selected Seat: </strong><span id="selected-seat">Not selected</span>
+                        <div id="seat-error" class="notification error" style="display: none; margin-top: 10px;"></div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button id="back-to-step1" class="btn-secondary">Back</button>
+                    <button id="next-to-step3" style="display: none;" data-i18n="continueToPayment">Continue to Payment</button>
+                </div>
+            </div>
+            
+            <!-- Step 3: Payment -->
+            <div id="step3-content" class="hidden">
+                <h2 data-i18n="paymentInfo">Payment Information</h2>
+                <div id="payment-notification" class="notification"></div>
+                
+                <div class="payment-summary" id="payment-summary">
+                    <h4>Order Summary</h4>
+                    <div class="summary-item">
+                        <span>Flight:</span>
+                        <span id="summary-flight">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Passenger:</span>
+                        <span id="summary-passenger">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Seat:</span>
+                        <span id="summary-seat">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Cabin Class:</span>
+                        <span id="summary-cabin">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Ticket Type:</span>
+                        <span id="summary-ticket-type">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Base Price:</span>
+                        <span id="summary-base-price">- TL</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Seat Selection Fee:</span>
+                        <span id="summary-seat-fee">- TL</span>
+                    </div>
+                    <div class="summary-item" id="summary-discount-row" style="display: none;">
+                        <span>Campaign Discount:</span>
+                        <span id="summary-discount" style="color: #28a745;">- TL</span>
+                    </div>
+                    <div class="summary-item total">
+                        <span>Total Amount:</span>
+                        <span id="summary-total">- TL</span>
+                    </div>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="campaign-code">Campaign Code (Optional)</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="campaign-code" placeholder="Enter campaign code" style="flex: 1;">
+                        <button type="button" id="apply-campaign-btn" class="btn-secondary" style="width: auto; margin-top: 0;">Apply</button>
+                    </div>
+                    <div id="campaign-message" style="margin-top: 5px; font-size: 0.9rem;"></div>
+                </div>
+                
+                <h3>Select Card Type</h3>
+                <div class="card-type-container">
+                    <div class="card-type" data-type="visa">
+                        <div class="card-icon visa-icon">VISA</div>
+                        <div>Visa</div>
+                    </div>
+                    <div class="card-type" data-type="mastercard">
+                        <div class="card-icon mastercard-icon">MasterCard</div>
+                        <div>MasterCard</div>
+                    </div>
+                </div>
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="card-holder" data-i18n="cardHolderName">Card Holder Name</label>
+                        <input type="text" id="card-holder" placeholder="Name on card">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="card-number" data-i18n="cardNumber">Card Number</label>
+                        <input type="text" id="card-number" placeholder="1234 5678 9012 3456">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="expiry-date" data-i18n="expiryDate">Expiry Date (MM/YY)</label>
+                        <input type="text" id="expiry-date" placeholder="MM/YY">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="cvv" data-i18n="cvv">CVV</label>
+                        <input type="text" id="cvv" placeholder="123" maxlength="3">
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button id="back-to-step2" class="btn-secondary">Back</button>
+                    <button id="process-payment" class="btn-success">
+                        <span id="process-payment-text" data-i18n="payNow">Pay Now</span>
+                        <span id="process-payment-loading" style="display: none;" class="loading"></span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Payment Success -->
+            <div id="payment-success" class="hidden">
+                <div class="payment-success">
+                    <div class="success-icon">✓</div>
+                    <h3 data-i18n="paymentSuccessful">Payment Successful!</h3>
+                    <p>Your ticket has been successfully booked.</p>
+                    <p>Ticket number: <strong id="success-ticket-number">-</strong></p>
+                    <p>A confirmation email has been sent to your email address.</p>
+                    <button id="view-ticket-btn" class="btn-success">View Ticket</button>
+                </div>
+            </div>
+            
+            <div id="ticket-preview-wrapper" class="ticket-preview hidden">
+                <div class="ticket-preview-header">
+                    <h3>Online Ticket Preview</h3>
+                    <button id="download-ticket-btn" class="btn-secondary" type="button">Download Image</button>
+                </div>
+                <canvas id="ticket-canvas" width="760" height="260"></canvas>
+            </div>
+        </section>
+        
+        <!-- Multiple Tickets Section -->
+        <section id="multi-booking" class="content-section">
+            <div class="step-indicator" id="multi-step-indicator">
+                <div class="step active" id="multi-step1">
+                    <div class="step-circle">1</div>
+                    <div class="step-label">Passenger Info</div>
+                </div>
+                <div class="step" id="multi-step2">
+                    <div class="step-circle">2</div>
+                    <div class="step-label" data-i18n="flightSeat">Flight & Seat</div>
+                </div>
+                <div class="step" id="multi-step3">
+                    <div class="step-circle">3</div>
+                    <div class="step-label" data-i18n="payment">Payment</div>
+                </div>
+            </div>
+            
+            <!-- Step 1: Passenger Information -->
+            <div id="multi-step1-content">
+                <h2 data-i18n="passengerInfo">Passenger Information</h2>
+                <div id="multi-notification" class="notification"></div>
+                
+                <div class="form-group">
+                    <label for="passenger-count">How many passengers?</label>
+                    <input id="passenger-count" type="number" min="1" value="1" placeholder="Passenger count">
+                </div>
+                
+                <div id="multi-passengers-container"></div>
+                
+                <button id="multi-next-to-step2" class="btn-success">Continue to Flight Selection</button>
+            </div>
+            
+            <!-- Step 2: Flight and Seat Selection -->
+            <div id="multi-step2-content" class="hidden">
+                <h2 data-i18n="flightSeat">Flight and Seat Selection</h2>
+                <div id="multi-step2-notification" class="notification"></div>
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="multi-departure" data-i18n="departureCity">Departure City</label>
+                        <select id="multi-departure">
+                            <option value="" data-i18n="selectCity">Select City</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="multi-destination" data-i18n="destinationCity">Destination City</label>
+                        <select id="multi-destination">
+                            <option value="" data-i18n="selectCity">Select City</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button id="multi-search-flights-btn" data-i18n="searchFlights">Search Flights</button>
+                
+                <div id="multi-flight-results" style="margin-top: 30px;"></div>
+                
+                <div id="multi-cabin-class-section" style="display: none; margin-top: 20px;">
+                    <h3>Cabin Class Selection</h3>
+                    <div class="form-group">
+                        <label for="multi-cabin-class">Cabin Class</label>
+                        <select id="multi-cabin-class">
+                            <option value="">Select Cabin Class</option>
+                            <option value="BUSINESS">Business Class</option>
+                            <option value="ECONOMY">Economy Class</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div id="multi-seat-option-section" style="display: none;">
+                    <h3>Seat Selection</h3>
+                    <div class="radio-group">
+                        <input type="radio" id="multi-seat-option-random" name="multi-seat-option" value="random" checked>
+                        <label class="seat-option-label" for="multi-seat-option-random">
+                            <span class="seat-option-text">Random Seat Assignment (Free)</span>
+                        </label>
+                        <small>System will assign random seats in your selected cabin class</small>
+                    </div>
+                    <div class="radio-group">
+                        <input type="radio" id="multi-seat-option-manual" name="multi-seat-option" value="manual">
+                        <label class="seat-option-label" for="multi-seat-option-manual">
+                            <span class="seat-option-text">Manual Seat Selection</span>
+                            <span class="fee-badge" id="multi-fee-badge">+100 TL</span>
+                        </label>
+                        <small>You can choose your preferred seats for an additional 100 TL per seat</small>
+                    </div>
+                </div>
+                
+                <div id="multi-seat-selection" style="display: none;">
+                    <h4>Select Your Seats</h4>
+                    <div id="multi-seat-map-container"></div>
+                    <div style="margin-top: 20px;">
+                        <strong>Selected Seats: </strong><span id="multi-selected-seats">Not selected</span>
+                        <div id="multi-seat-error" class="notification error" style="display: none; margin-top: 10px;"></div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button id="multi-back-to-step1" class="btn-secondary">Back</button>
+                    <button id="multi-next-to-step3" style="display: none;" data-i18n="continueToPayment">Continue to Payment</button>
+                </div>
+            </div>
+            
+            <!-- Step 3: Payment -->
+            <div id="multi-step3-content" class="hidden">
+                <h2 data-i18n="paymentInfo">Payment Information</h2>
+                <div id="multi-payment-notification" class="notification"></div>
+                
+                <div class="payment-summary" id="multi-payment-summary">
+                    <h4>Order Summary</h4>
+                    <div class="summary-item">
+                        <span>Flight:</span>
+                        <span id="multi-summary-flight">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Passengers:</span>
+                        <span id="multi-summary-passengers">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Cabin Class:</span>
+                        <span id="multi-summary-cabin">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Seats:</span>
+                        <span id="multi-summary-seats">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Seat Selection Type:</span>
+                        <span id="multi-summary-seat-type">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Base Price per Ticket:</span>
+                        <span id="multi-summary-base-price">- TL</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Seat Selection Fee:</span>
+                        <span id="multi-summary-seat-fee">- TL</span>
+                    </div>
+                    <div class="summary-item" id="multi-summary-discount-row" style="display: none;">
+                        <span>Campaign Discount:</span>
+                        <span id="multi-summary-discount" style="color: #28a745;">- TL</span>
+                    </div>
+                    <div class="summary-item total">
+                        <span>Total Amount:</span>
+                        <span id="multi-summary-total">- TL</span>
+                    </div>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="multi-campaign-code">Campaign Code (Optional)</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="multi-campaign-code" placeholder="Enter campaign code" style="flex: 1;">
+                        <button type="button" id="multi-apply-campaign-btn" class="btn-secondary" style="width: auto; margin-top: 0;">Apply</button>
+                    </div>
+                    <div id="multi-campaign-message" style="margin-top: 5px; font-size: 0.9rem;"></div>
+                </div>
+                
+                <h3>Select Card Type</h3>
+                <div class="card-type-container">
+                    <div class="card-type" data-type="visa" id="multi-visa">
+                        <div class="card-icon visa-icon">VISA</div>
+                        <div>Visa</div>
+                    </div>
+                    <div class="card-type" data-type="mastercard" id="multi-mastercard">
+                        <div class="card-icon mastercard-icon">MasterCard</div>
+                        <div>MasterCard</div>
+                    </div>
+                </div>
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="multi-card-holder">Card Holder Name</label>
+                        <input type="text" id="multi-card-holder" placeholder="Name on card">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="multi-card-number">Card Number</label>
+                        <input type="text" id="multi-card-number" placeholder="1234 5678 9012 3456">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="multi-expiry-date">Expiry Date (MM/YY)</label>
+                        <input type="text" id="multi-expiry-date" placeholder="MM/YY">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="multi-cvv">CVV</label>
+                        <input type="text" id="multi-cvv" placeholder="123" maxlength="3">
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button id="multi-back-to-step2" class="btn-secondary">Back</button>
+                    <button id="multi-process-payment" class="btn-success">
+                        <span id="multi-process-payment-text" data-i18n="payNow">Pay Now</span>
+                        <span id="multi-process-payment-loading" style="display: none;" class="loading"></span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Payment Success -->
+            <div id="multi-payment-success" class="hidden">
+                <div class="payment-success">
+                    <div class="success-icon">✓</div>
+                    <h3 data-i18n="paymentSuccessful">Payment Successful!</h3>
+                    <p>All tickets have been successfully booked.</p>
+                    <p>Ticket numbers: <strong id="multi-success-ticket-numbers">-</strong></p>
+                    <p>Confirmation emails have been sent to passengers.</p>
+                    <button id="multi-view-tickets-btn" class="btn-success">View Tickets</button>
+                </div>
+            </div>
+            
+            <div id="multi-ticket-preview-wrapper" class="ticket-preview hidden">
+                <div class="ticket-preview-header">
+                    <h3>Online Tickets Preview</h3>
+                    <button id="download-multi-ticket-btn" class="btn-secondary" type="button">Download All Tickets</button>
+                </div>
+                <div id="multi-ticket-preview-list" class="grid-2" style="gap: 16px;"></div>
+            </div>
+        </section>
+        
+        <!-- My Tickets Section -->
+        <section id="my-tickets" class="content-section">
+            <h2 data-i18n="myTickets">My Tickets</h2>
+            <div id="tickets-notification" class="notification"></div>
+            
+            <div id="active-tickets-container">
+                <h3 data-i18n="activeTickets">Active Tickets</h3>
+                <div id="active-tickets-list"></div>
+            </div>
+            
+            <div id="cancelled-tickets-container" style="margin-top: 30px;">
+                <h3 data-i18n="cancelledTickets">Cancelled Tickets</h3>
+                <div id="cancelled-tickets-list"></div>
+            </div>
+        </section>
+        
+        <!-- Cancel Ticket Section -->
+        <section id="cancel-ticket" class="content-section">
+            <h2 data-i18n="cancelTicket">Cancel Ticket</h2>
+            <div id="cancel-notification" class="notification"></div>
+            
+            <div class="form-group">
+                <label for="ticket-number" data-i18n="ticketNumber">Ticket Number to Cancel</label>
+                <input type="text" id="ticket-number" data-i18n-placeholder="enterTicketNumber" placeholder="Enter ticket number">
+            </div>
+            
+            <button id="cancel-ticket-btn">
+                <span id="cancel-ticket-text" data-i18n="cancelTicket">Cancel Ticket</span>
+                <span id="cancel-ticket-loading" style="display: none;" class="loading"></span>
+            </button>
+        </section>
+
+        <!-- Check-in Section -->
+        <section id="check-in" class="content-section">
+            <h2 data-i18n="onlineCheckIn">Online Check-in</h2>
+            <div id="checkin-notification" class="notification"></div>
+            
+            <!-- Flight Rules Section -->
+            <div id="flight-rules-section" style="margin-bottom: 30px;">
+                <h3>Flight Rules and Regulations</h3>
+                <div style="background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; max-height: 400px; overflow-y: auto; margin-bottom: 20px;">
+                    <h4 style="color: #1e3c72; margin-bottom: 15px;">1. Baggage Rules</h4>
+                    <ul style="margin-bottom: 20px; line-height: 1.8;">
+                        <li>Carry-on baggage must be maximum 8 kg and 55x40x23 cm in size.</li>
+                        <li>You are entitled to 1 carry-on bag and 1 personal item (bag, laptop bag) for cabin baggage.</li>
+                        <li>Check-in baggage has a maximum weight limit of 23 kg.</li>
+                        <li>Dangerous materials (flammable, explosive, sharp objects) cannot be carried in baggage.</li>
+                    </ul>
+                    
+                    <h4 style="color: #1e3c72; margin-bottom: 15px;">2. Check-in Rules</h4>
+                    <ul style="margin-bottom: 20px; line-height: 1.8;">
+                        <li>Online check-in starts 24 hours before the flight and ends 2 hours before.</li>
+                        <li>You must arrive at the airport at least 2 hours in advance.</li>
+                        <li>For international flights, it is recommended to arrive at least 3 hours in advance.</li>
+                        <li>Have your valid ID or passport ready during check-in.</li>
+                    </ul>
+                    
+                    <h4 style="color: #1e3c72; margin-bottom: 15px;">3. Security Rules</h4>
+                    <ul style="margin-bottom: 20px; line-height: 1.8;">
+                        <li>Remove all electronic devices when passing through security check.</li>
+                        <li>Liquid substances cannot exceed 100 ml and must be carried in a transparent bag.</li>
+                        <li>Sharp, piercing objects and liquids cannot be carried in carry-on baggage.</li>
+                        <li>Follow the instructions of security personnel.</li>
+                    </ul>
+                    
+                    <h4 style="color: #1e3c72; margin-bottom: 15px;">4. In-Flight Rules</h4>
+                    <ul style="margin-bottom: 20px; line-height: 1.8;">
+                        <li>Mobile phones must be set to airplane mode during the flight.</li>
+                        <li>When the seatbelt sign is on, fasten your seatbelt and remain seated.</li>
+                        <li>Smoking is strictly prohibited.</li>
+                        <li>Alcohol consumption is limited and under the control of the crew.</li>
+                    </ul>
+                    
+                    <h4 style="color: #1e3c72; margin-bottom: 15px;">5. Cancellation and Change Rules</h4>
+                    <ul style="margin-bottom: 20px; line-height: 1.8;">
+                        <li>Ticket cancellation must be done 24 hours before the flight.</li>
+                        <li>Refund amounts in cancellation transactions may vary according to ticket type.</li>
+                        <li>Additional fees may be charged for ticket changes.</li>
+                        <li>In case of no-show, the ticket fee is not refunded.</li>
+                    </ul>
+                    
+                    <h4 style="color: #1e3c72; margin-bottom: 15px;">6. Health and Special Conditions</h4>
+                    <ul style="margin-bottom: 20px; line-height: 1.8;">
+                        <li>Pregnant passengers must bring a doctor's report after the 28th week.</li>
+                        <li>Special service requests for disabled passengers must be notified in advance.</li>
+                        <li>A medical report may be required for sick passengers.</li>
+                        <li>Special dietary needs must be informed in advance.</li>
+                    </ul>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" id="rules-accepted" style="width: auto; cursor: pointer;">
+                        <span style="font-weight: 600; color: #1e3c72;">I have read and accept the flight rules above.</span>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Quiz Section -->
+            <div id="quiz-section" style="display: none; margin-bottom: 30px;">
+                <h3>Flight Rules Knowledge Test</h3>
+                <p style="margin-bottom: 20px; color: #666;">Please answer the following questions. You need to answer at least 5 questions correctly.</p>
+                <div id="quiz-container"></div>
+                <button id="submit-quiz-btn" type="button" style="margin-top: 20px; display: none;">Submit Test</button>
+                <div id="quiz-result" style="margin-top: 20px; display: none;"></div>
+            </div>
+            
+            <div class="grid-2" id="checkin-form" style="display: none;">
+                <div class="form-group">
+                    <label for="checkin-ticket-number" data-i18n="ticketNumber">Ticket Number</label>
+                    <input type="text" id="checkin-ticket-number" data-i18n-placeholder="enterTicketNumber" placeholder="Enter ticket number">
+                </div>
+                <div class="form-group">
+                    <label for="checkin-surname" data-i18n="passengerSurname">Passenger Surname</label>
+                    <input type="text" id="checkin-surname" data-i18n-placeholder="enterSurname" placeholder="Enter surname">
+                </div>
+            </div>
+            <button id="checkin-btn" type="button" style="display: none;" data-i18n="checkIn">Check-in</button>
+            <div id="checkin-status" class="email-status" style="display: none;"></div>
+        </section>
+    </div>
+    
+    <!-- About Us Section -->
+    <div class="about-section">
+        <div class="container">
+            <h2 data-i18n="aboutUs">About Us</h2>
+            <div class="about-content">
+                <p>
+                    <strong>Would you like to get to know the Airline Reservation System more closely?</strong> 
+                    You are invited to witness the success-filled story of Turkey's airline reservation system that flies to the most cities.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Contact Section -->
+    <div class="contact-section">
+        <div class="container">
+            <h2 data-i18n="contactUs">Contact Us</h2>
+            <p data-i18n="forInquiries">For inquiries and support, please contact us:</p>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <div>
+                        <strong>Dila Kübra DİRİCANLI</strong><br>
+                        <a href="mailto:230201039@sivas.edu.tr">230201039@sivas.edu.tr</a>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div>
+                        <strong>Harun Can ELİAÇIK</strong><br>
+                        <a href="mailto:230201043@sivas.edu.tr">230201043@sivas.edu.tr</a>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div>
+                        <strong>Rümeysa YÜCEL</strong><br>
+                        <a href="mailto:230201077@sivas.edu.tr">230201077@sivas.edu.tr</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chatbot -->
+    <div id="chatbot-container" class="chatbot-container">
+        <div id="chatbot-header" class="chatbot-header">
+            <div class="chatbot-header-info">
+                <div class="chatbot-avatar">✈️</div>
+                <div>
+                    <div class="chatbot-title">Flight Assistant</div>
+                    <div class="chatbot-status">Online</div>
+                </div>
+            </div>
+            <button id="chatbot-toggle" class="chatbot-toggle" title="Minimize">−</button>
+        </div>
+        <div id="chatbot-messages" class="chatbot-messages">
+            <div class="chatbot-welcome">
+                <div class="chatbot-welcome-icon">👋</div>
+                <div class="chatbot-welcome-text">Welcome! How can I help you today?</div>
+            </div>
+            <div class="chatbot-quick-questions" id="chatbot-quick-questions">
+                <div class="quick-questions-title">Quick Questions:</div>
+                <button class="quick-question-btn" data-question="How do I search for flights?">🔍 Search Flights</button>
+                <button class="quick-question-btn" data-question="How do I book a ticket?">🎫 Book a Ticket</button>
+                <button class="quick-question-btn" data-question="What is the baggage allowance?">🧳 Baggage Info</button>
+                <button class="quick-question-btn" data-question="How do I cancel my booking?">❌ Cancel Booking</button>
+                <button class="quick-question-btn" data-question="What payment methods do you accept?">💳 Payment Methods</button>
+                <button class="quick-question-btn" data-question="What cities do you fly to?">🌍 Destinations</button>
+            </div>
+        </div>
+        <div class="chatbot-input-container">
+            <input type="text" id="chatbot-input" class="chatbot-input" placeholder="Type your message here..." autocomplete="off">
+            <button id="chatbot-send" class="chatbot-send" title="Send message">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
+    </div>
+    <button id="chatbot-button" class="chatbot-button" title="Open chat">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+        <span class="chatbot-badge">1</span>
+    </button>
+
+    <style>
+        /* Chatbot Button */
+        .chatbot-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(30, 60, 114, 0.4);
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+        .chatbot-button:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 12px 28px rgba(30, 60, 114, 0.6);
+        }
+        .chatbot-button:active {
+            transform: scale(0.95);
+        }
+        .chatbot-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4757;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            border: 2px solid white;
+            animation: bounce 1s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 8px 20px rgba(30, 60, 114, 0.4); }
+            50% { box-shadow: 0 8px 30px rgba(30, 60, 114, 0.6); }
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* Chatbot Container */
+        .chatbot-container {
+            position: fixed;
+            bottom: 110px;
+            right: 30px;
+            width: 400px;
+            height: 600px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            display: none;
+            flex-direction: column;
+            z-index: 1001;
+            overflow: hidden;
+            animation: slideUp 0.3s ease-out;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .chatbot-container.active {
+            display: flex;
+        }
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Chatbot Header */
+        .chatbot-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .chatbot-header-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .chatbot-avatar {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            backdrop-filter: blur(10px);
+        }
+        .chatbot-title {
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 2px;
+        }
+        .chatbot-status {
+            font-size: 12px;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .chatbot-status::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #2ecc71;
+            border-radius: 50%;
+            display: inline-block;
+            animation: blink 2s infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .chatbot-toggle {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+        }
+        .chatbot-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        /* Chatbot Messages */
+        .chatbot-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: linear-gradient(to bottom, #f8f9fa, #ffffff);
+            scroll-behavior: smooth;
+        }
+        .chatbot-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chatbot-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .chatbot-messages::-webkit-scrollbar-thumb {
+            background: #ddd;
+            border-radius: 3px;
+        }
+        .chatbot-messages::-webkit-scrollbar-thumb:hover {
+            background: #bbb;
+        }
+        .chatbot-welcome {
+            text-align: center;
+            padding: 30px 20px;
+            margin-bottom: 20px;
+        }
+        .chatbot-welcome-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .chatbot-welcome-text {
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .chatbot-message {
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            animation: messageSlide 0.3s ease-out;
+        }
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .chatbot-message.user {
+            align-items: flex-end;
+        }
+        .chatbot-message.bot {
+            align-items: flex-start;
+        }
+        .chatbot-message-content {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            line-height: 1.5;
+            font-size: 14px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        .chatbot-message.user .chatbot-message-content {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        .chatbot-message.bot .chatbot-message-content {
+            background: white;
+            color: #333;
+            border: 1px solid #e8e8e8;
+            border-bottom-left-radius: 4px;
+        }
+        .chatbot-quick-questions {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(30, 60, 114, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(30, 60, 114, 0.1);
+        }
+        .quick-questions-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1e3c72;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .quick-question-btn {
+            display: block;
+            width: 100%;
+            padding: 10px 14px;
+            margin-bottom: 8px;
+            background: white;
+            border: 1.5px solid #e8e8e8;
+            border-radius: 10px;
+            color: #333;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        .quick-question-btn:hover {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            border-color: #1e3c72;
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(30, 60, 114, 0.3);
+        }
+        .quick-question-btn:active {
+            transform: translateX(2px) scale(0.98);
+        }
+        .quick-question-btn:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Chatbot Input */
+        .chatbot-input-container {
+            display: flex;
+            padding: 16px;
+            border-top: 1px solid #e8e8e8;
+            background: white;
+            gap: 10px;
+            align-items: center;
+        }
+        .chatbot-input {
+            flex: 1;
+            padding: 12px 18px;
+            border: 2px solid #e8e8e8;
+            border-radius: 25px;
+            outline: none;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            background: #f8f9fa;
+        }
+        .chatbot-input:focus {
+            border-color: #1e3c72;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+        }
+        .chatbot-send {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(30, 60, 114, 0.3);
+        }
+        .chatbot-send:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(30, 60, 114, 0.4);
+        }
+        .chatbot-send:active {
+            transform: scale(0.95);
+        }
+        .chatbot-send:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .chatbot-container {
+                width: calc(100% - 40px);
+                right: 20px;
+                bottom: 100px;
+                height: calc(100vh - 140px);
+                max-height: 600px;
+            }
+            .chatbot-button {
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+
+        /* Cookie Consent Banner */
+        .cookie-consent {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+            padding: 25px 30px;
+            z-index: 10000;
+            transform: translateY(100%);
+            transition: transform 0.4s ease;
+            border-top: 3px solid #2a5298;
+        }
+
+        .cookie-consent.show {
+            transform: translateY(0);
+        }
+
+        .cookie-consent-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+
+        .cookie-consent-text {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .cookie-consent-text h3 {
+            color: #1e3c72;
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+            border: none;
+            padding: 0;
+        }
+
+        .cookie-consent-text p {
+            color: #555;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .cookie-consent-text a {
+            color: #2a5298;
+            text-decoration: underline;
+            font-weight: 600;
+        }
+
+        .cookie-consent-text a:hover {
+            color: #1e3c72;
+        }
+
+        .cookie-consent-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .cookie-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .cookie-btn-accept-all {
+            background-color: #2a5298;
+            color: white;
+        }
+
+        .cookie-btn-accept-all:hover {
+            background-color: #1e3c72;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(42, 82, 152, 0.3);
+        }
+
+        .cookie-btn-necessary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .cookie-btn-necessary:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+        }
+
+        .cookie-btn-reject {
+            background-color: transparent;
+            color: #555;
+            border: 2px solid #ddd;
+        }
+
+        .cookie-btn-reject:hover {
+            background-color: #f5f7fa;
+            border-color: #2a5298;
+            color: #2a5298;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .cookie-consent {
+                padding: 20px;
+            }
+
+            .cookie-consent-content {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .cookie-consent-text {
+                min-width: 100%;
+                margin-bottom: 15px;
+            }
+
+            .cookie-consent-buttons {
+                width: 100%;
+                flex-direction: column;
+            }
+
+            .cookie-btn {
+                width: 100%;
+            }
+        }
+    </style>
+
+    <!-- Cookie Consent Banner -->
+    <div id="cookieConsent" class="cookie-consent">
+        <div class="cookie-consent-content">
+            <div class="cookie-consent-text">
+                <h3>Cookie Consent</h3>
+                <p>
+                    This website uses cookies in accordance with the Personal Data Protection Law to store your personal information and improve your browsing experience. 
+                    By continuing to use this site, you consent to our use of cookies. 
+                    <a href="#" onclick="event.preventDefault(); alert('For more information about our cookie policy, please contact our support team.');">Learn more</a>
+                </p>
+            </div>
+            <div class="cookie-consent-buttons">
+                <button class="cookie-btn cookie-btn-accept-all" onclick="acceptAllCookies()">Accept All Cookies</button>
+                <button class="cookie-btn cookie-btn-necessary" onclick="acceptNecessaryCookies()">Accept Necessary Cookies</button>
+                <button class="cookie-btn cookie-btn-reject" onclick="rejectAllCookies()">Reject All</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Cookie Consent Management
+        (function() {
+            // Show cookie banner every time page loads
+            window.addEventListener('load', function() {
+                setTimeout(function() {
+                    const banner = document.getElementById('cookieConsent');
+                    if (banner) {
+                        banner.style.display = 'block';
+                        banner.classList.add('show');
+                    }
+                }, 500);
+            });
+
+            // Accept All Cookies
+            window.acceptAllCookies = function() {
+                localStorage.setItem('cookieConsent', 'all');
+                localStorage.setItem('cookieConsentDate', new Date().toISOString());
+                hideCookieBanner();
+                // Here you can enable all cookies (analytics, marketing, etc.)
+                console.log('All cookies accepted');
+            };
+
+            // Accept Necessary Cookies Only
+            window.acceptNecessaryCookies = function() {
+                localStorage.setItem('cookieConsent', 'necessary');
+                localStorage.setItem('cookieConsentDate', new Date().toISOString());
+                hideCookieBanner();
+                // Only enable necessary cookies (session, security, etc.)
+                console.log('Necessary cookies only accepted');
+            };
+
+            // Reject All Cookies
+            window.rejectAllCookies = function() {
+                localStorage.setItem('cookieConsent', 'rejected');
+                localStorage.setItem('cookieConsentDate', new Date().toISOString());
+                hideCookieBanner();
+                // Disable all non-necessary cookies
+                console.log('All cookies rejected');
+            };
+
+            // Hide cookie banner
+            function hideCookieBanner() {
+                const banner = document.getElementById('cookieConsent');
+                if (banner) {
+                    banner.classList.remove('show');
+                    setTimeout(function() {
+                        banner.style.display = 'none';
+                    }, 400);
+                }
+            }
+
+            // Check cookie consent status (for use in other parts of the application)
+            window.getCookieConsent = function() {
+                return localStorage.getItem('cookieConsent') || null;
+            };
+
+            // Check if specific cookie type is allowed
+            window.isCookieAllowed = function(type) {
+                const consent = localStorage.getItem('cookieConsent');
+                if (consent === 'all') return true;
+                if (consent === 'necessary' && type === 'necessary') return true;
+                if (consent === 'rejected') return false;
+                return false; // Default: not allowed until user makes a choice
+            };
+        })();
+    </script>
+
+    <script src="app.js"></script>
+</body>
+</html>

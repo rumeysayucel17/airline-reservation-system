@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Airline Management System</title>
+    <link rel="stylesheet" href="admin-dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container">
+            <div class="login-header">
+                <h1>✈️ Admin Panel</h1>
+                <p>Please login to continue</p>
+            </div>
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required autocomplete="current-password">
+                </div>
+                <div id="loginError" class="error-message" style="display: none;"></div>
+                <button type="submit" class="btn-primary login-btn">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="admin-container" id="adminContainer" style="display: none;">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>✈️ Admin Panel</h1>
+                <button class="theme-toggle" id="themeToggle" title="Dark Mode">🌙</button>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#dashboard" class="nav-item active" data-section="dashboard" data-roles="super_admin,operations,accounting">
+                    <span class="icon">📊</span> Dashboard
+                </a>
+                <a href="#flights" class="nav-item" data-section="flights" data-roles="super_admin,operations">
+                    <span class="icon">✈️</span> Flight Management
+                </a>
+                <a href="#aircraft" class="nav-item" data-section="aircraft" data-roles="super_admin,operations,accounting">
+                    <span class="icon">🛩️</span> Aircraft & Seats
+                </a>
+                <a href="#reservations" class="nav-item" data-section="reservations" data-roles="super_admin,operations">
+                    <span class="icon">🎫</span> Reservations
+                </a>
+                <a href="#passengers" class="nav-item" data-section="passengers" data-roles="super_admin,operations,accounting">
+                    <span class="icon">👥</span> Passengers
+                </a>
+                <a href="#pricing" class="nav-item" data-section="pricing" data-roles="super_admin,operations,accounting">
+                    <span class="icon">💰</span> Pricing & Campaigns
+                </a>
+                <a href="#payments" class="nav-item" data-section="payments" data-roles="super_admin,accounting">
+                    <span class="icon">💳</span> Payments & Accounting
+                </a>
+                <a href="#notifications" class="nav-item" data-section="notifications" data-roles="super_admin,operations,accounting">
+                    <span class="icon">📧</span> Notifications
+                </a>
+                <a href="#admins" class="nav-item" data-section="admins" data-roles="super_admin">
+                    <span class="icon">🔐</span> User Management
+                </a>
+                <a href="#reports" class="nav-item" data-section="reports" data-roles="super_admin,operations,accounting">
+                    <span class="icon">📈</span> Reports
+                </a>
+                <a href="#settings" class="nav-item" data-section="settings" data-roles="super_admin">
+                    <span class="icon">⚙️</span> System Settings
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="admin-info">
+                    <div class="admin-avatar">👨‍💼</div>
+                    <div class="admin-details">
+                        <p class="admin-name" id="adminName">Admin</p>
+                        <p class="admin-role" id="adminRole">Super Admin</p>
+                    </div>
+                </div>
+                <button class="logout-btn" id="logoutBtn">Logout</button>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="content-section active" data-roles="super_admin,operations,accounting">
+                <div class="section-header">
+                    <h2>📊 Dashboard - Overview</h2>
+                    <div class="header-actions">
+                        <input type="date" id="dashboardDate" class="date-input">
+                        <button class="btn-secondary" id="refreshDashboard">Refresh</button>
+                    </div>
+                </div>
+                
+                <!-- Weather Widget for Admin -->
+                <div id="admin-weather-widget" class="admin-weather-widget">
+                    <div class="admin-weather-content">
+                        <div class="admin-weather-icon" id="admin-weather-icon">🌤️</div>
+                        <div class="admin-weather-info">
+                            <div class="admin-weather-location" id="admin-weather-location">Istanbul</div>
+                            <div class="admin-weather-temp" id="admin-weather-temp">18°C</div>
+                            <div class="admin-weather-condition" id="admin-weather-condition">Partly Cloudy</div>
+                        </div>
+                    </div>
+                    <div id="admin-weather-warning" class="admin-weather-warning" style="display: none;">
+                        <span class="admin-warning-icon">⚠️</span>
+                        <span class="admin-warning-text" id="admin-warning-text"></span>
+                    </div>
+                </div>
+                
+                <div class="dashboard-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">🎫</div>
+                        <div class="stat-content">
+                            <p class="stat-label">Total Reservations</p>
+                            <p class="stat-value" id="totalReservations">0</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">✈️</div>
+                        <div class="stat-content">
+                            <p class="stat-label">Active Flights</p>
+                            <p class="stat-value" id="activeFlights">0</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">📈</div>
+                        <div class="stat-content">
+                            <p class="stat-label">Occupancy Rate</p>
+                            <p class="stat-value" id="occupancyRate">0%</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">💵</div>
+                        <div class="stat-content">
+                            <p class="stat-label">Daily Revenue</p>
+                            <p class="stat-value" id="dailyRevenue">₺0</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-content">
+                            <p class="stat-label">Monthly Revenue</p>
+                            <p class="stat-value" id="monthlyRevenue">₺0</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">❌</div>
+                        <div class="stat-content">
+                            <p class="stat-label">Cancellation Rate</p>
+                            <p class="stat-value" id="cancellationRate">0%</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <h3>Monthly Revenue Trend</h3>
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <h3>Reservation Trend (7 Days)</h3>
+                        <canvas id="reservationChart"></canvas>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <h3>Top Routes</h3>
+                        <canvas id="topRoutesChart"></canvas>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <h3>System Status</h3>
+                        <div class="status-list">
+                            <div class="status-item">
+                                <span class="status-label">Database</span>
+                                <span class="status-badge success">🟢 Active</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">Email Service</span>
+                                <span class="status-badge success">🟢 Active</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">Payment System</span>
+                                <span class="status-badge success">🟢 Active</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Flight Management Section -->
+            <section id="flights" class="content-section" data-roles="super_admin,operations">
+                <div class="section-header">
+                    <h2>✈️ Flight Management</h2>
+                    <button class="btn-primary" id="addFlightBtn">+ Add New Flight</button>
+                </div>
+                
+                <div class="filters-bar">
+                    <input type="text" id="flightSearch" placeholder="Search flight number...">
+                    <select id="flightStatusFilter">
+                        <option value="">All Status</option>
+                        <option value="ACTIVE">Active</option>
+                        <option value="CANCELLED">Cancelled</option>
+                        <option value="DELAYED">Delayed</option>
+                    </select>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Flight #</th>
+                                <th>Departure</th>
+                                <th>Arrival</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Price</th>
+                                <th>Seats</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="flightsTableBody">
+                            <!-- Dynamically populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <!-- Aircraft Management Section -->
+            <section id="aircraft" class="content-section" data-roles="super_admin,operations,accounting">
+                <div class="section-header">
+                    <h2>🛩️ Aircraft & Seat Management</h2>
+                    <button class="btn-primary" id="addAircraftBtn">+ Add New Aircraft</button>
+                </div>
+                
+                <div class="aircraft-grid" id="aircraftGrid">
+                    <!-- Dynamically populated -->
+                </div>
+            </section>
+            
+            <!-- Reservations Section -->
+            <section id="reservations" class="content-section" data-roles="super_admin,operations">
+                <div class="section-header">
+                    <h2>🎫 Reservation Management</h2>
+                </div>
+                
+                <div class="filters-bar">
+                    <input type="text" id="reservationSearch" placeholder="Search PNR/Reservation code...">
+                    <select id="reservationStatusFilter">
+                        <option value="">All Status</option>
+                        <option value="CONFIRMED">Confirmed</option>
+                        <option value="CANCELLED">Cancelled</option>
+                        <option value="NO_SHOW">No-Show</option>
+                    </select>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>PNR</th>
+                                <th>Passenger</th>
+                                <th>Flight</th>
+                                <th>Date</th>
+                                <th>Seat</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reservationsTableBody">
+                            <!-- Dynamically populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <!-- Passengers Section -->
+            <section id="passengers" class="content-section" data-roles="super_admin,operations,accounting">
+                <div class="section-header">
+                    <h2>👥 Passenger Management</h2>
+                </div>
+                
+                <div class="filters-bar">
+                    <input type="text" id="passengerSearch" placeholder="Search passenger name or email...">
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Total Flights</th>
+                                <th>Registration Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="passengersTableBody">
+                            <!-- Dynamically populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <!-- Pricing & Campaigns Section -->
+            <section id="pricing" class="content-section" data-roles="super_admin,operations,accounting">
+                <div class="section-header">
+                    <h2>💰 Pricing & Campaigns</h2>
+                    <button class="btn-primary" id="addCampaignBtn">+ Add Campaign</button>
+                </div>
+                
+                <div class="pricing-tabs">
+                    <button class="tab-btn active" data-tab="campaigns">Campaigns</button>
+                    <button class="tab-btn" data-tab="pricing">Route Pricing</button>
+                </div>
+                
+                <div id="campaigns" class="tab-content active">
+                    <div class="campaigns-grid" id="campaignsGrid">
+                        <!-- Dinamik olarak doldurulacak -->
+                    </div>
+                </div>
+                
+                <div id="pricing" class="tab-content">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Route</th>
+                                    <th>Economy</th>
+                                    <th>Business</th>
+                                    <th>Extra Baggage</th>
+                                    <th>Seat Selection</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pricingTableBody">
+                                <!-- Dynamically populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Payments Section -->
+            <section id="payments" class="content-section" data-roles="super_admin,accounting">
+                <div class="section-header">
+                    <h2>💳 Payments & Accounting</h2>
+                </div>
+                
+                <div class="filters-bar">
+                    <input type="date" id="paymentStartDate">
+                    <input type="date" id="paymentEndDate">
+                    <button class="btn-secondary" id="generatePaymentReport">Generate Report</button>
+                </div>
+                
+                <div class="payment-stats">
+                    <div class="stat-card">
+                        <p class="stat-label">Total Transactions</p>
+                        <p class="stat-value" id="totalTransactions">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <p class="stat-label">Successful Payments</p>
+                        <p class="stat-value" id="successfulPayments">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <p class="stat-label">Failed Payments</p>
+                        <p class="stat-value" id="failedPayments">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <p class="stat-label">Refunds</p>
+                        <p class="stat-value" id="refunds">$0</p>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Transaction ID</th>
+                                <th>Passenger</th>
+                                <th>Amount</th>
+                                <th>Method</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paymentsTableBody">
+                            <!-- Dynamically populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <!-- Notifications Section -->
+            <section id="notifications" class="content-section" data-roles="super_admin,operations,accounting">
+                <div class="section-header">
+                    <h2>📧 Notifications & Announcements</h2>
+                    <button class="btn-primary" id="sendNotificationBtn">+ Send Notification</button>
+                </div>
+                
+                <div class="notification-form">
+                    <div class="form-group">
+                        <label>Recipient Type</label>
+                        <select id="notificationRecipient">
+                            <option value="all">All Passengers</option>
+                            <option value="specific">Business Passengers</option>
+                            <option value="flight">Economy Passengers</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Subject</label>
+                        <input type="text" id="notificationSubject" placeholder="Notification subject...">
+                    </div>
+                    <div class="form-group">
+                        <label>Message</label>
+                        <textarea id="notificationMessage" placeholder="Message content..."></textarea>
+                    </div>
+                    <button class="btn-primary" id="sendNotificationConfirm">Send</button>
+                </div>
+                
+                <h3>Sent Notifications</h3>
+                <div class="notifications-list" id="notificationsList">
+                    <!-- Dinamik olarak doldurulacak -->
+                </div>
+            </section>
+            
+            <!-- Admin Management Section -->
+            <section id="admins" class="content-section" data-roles="super_admin">
+                <div class="section-header">
+                    <h2>🔐 User & Permission Management</h2>
+                    <button class="btn-primary" id="addAdminBtn">+ Add Admin</button>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Permission Level</th>
+                                <th>Last Login</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminsTableBody">
+                            <!-- Dynamically populated -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h3>Login Logs</h3>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Admin</th>
+                                <th>Action</th>
+                                <th>Description</th>
+                                <th>Date & Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logsTableBody">
+                            <!-- Dynamically populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <!-- Reports Section -->
+            <section id="reports" class="content-section" data-roles="super_admin,operations,accounting">
+                <div class="section-header">
+                    <h2>📈 Reports & Analytics</h2>
+                </div>
+                
+                <div class="reports-tabs">
+                    <button class="tab-btn active" data-tab="revenue-report">Profitable Routes</button>
+                    <button class="tab-btn" data-tab="occupancy-report">Occupancy Report</button>
+                    <button class="tab-btn" data-tab="cancellation-report">Cancellation Report</button>
+                </div>
+                
+                <div id="revenue-report" class="tab-content active">
+                    <canvas id="revenueReportChart"></canvas>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Route</th>
+                                    <th>Total Revenue</th>
+                                    <th>Number of Bookings</th>
+                                </tr>
+                            </thead>
+                            <tbody id="revenueReportBody">
+                                <!-- Dynamically populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div id="occupancy-report" class="tab-content">
+                    <canvas id="occupancyReportChart"></canvas>
+                </div>
+                
+                <div id="cancellation-report" class="tab-content">
+                    <div class="stat-card">
+                        <p class="stat-label">Total Cancellations</p>
+                        <p class="stat-value" id="totalCancellations">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <p class="stat-label">Cancellation Rate</p>
+                        <p class="stat-value" id="cancellationReportRate">0%</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Settings Section -->
+            <section id="settings" class="content-section" data-roles="super_admin">
+                <div class="section-header">
+                    <h2>⚙️ System Settings</h2>
+                </div>
+                
+                <div class="settings-grid">
+                    <div class="settings-card">
+                        <h3>Currency</h3>
+                        <select id="currencySetting">
+                            <option value="TRY">₺ Turkish Lira</option>
+                            <option value="USD">$ US Dollar</option>
+                            <option value="EUR">€ Euro</option>
+                        </select>
+                    </div>
+                    
+                    <div class="settings-card">
+                        <h3>Timezone</h3>
+                        <select id="timezoneSetting">
+                            <option value="Europe/Istanbul">Europe/Istanbul</option>
+                            <option value="UTC">UTC</option>
+                            <option value="Europe/London">Europe/London</option>
+                        </select>
+                    </div>
+                    
+                    <div class="settings-card">
+                        <h3>Tax Rate</h3>
+                        <input type="number" id="taxRateSetting" min="0" max="100" step="0.01">
+                        <small>%</small>
+                    </div>
+                    
+                    <div class="settings-card">
+                        <h3>Maintenance Mode</h3>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="maintenanceModeSetting">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <button class="btn-primary" id="saveSettingsBtn">Save Settings</button>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Modal for Forms -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modalBody">
+                <!-- Dinamik olarak doldurulacak -->
+            </div>
+        </div>
+    </div>
+    
+    <script src="app.js"></script>
+    <script src="admin-dashboard-real.js"></script>
+</body>
+</html>
